@@ -122,5 +122,41 @@ namespace DotVVM.Analysers {
                 return ResourceManager.GetString("Serializability_NonSupportedType_Message", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AllowStaticCommand is error-prone and discouraged in favor of static command services.
+        /// </summary>
+        internal static string StaticCommands_DoNotUseAllowStaticCommand_Description {
+            get {
+                return ResourceManager.GetString("StaticCommands_DoNotUseAllowStaticCommand_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BlaBla.
+        /// </summary>
+        internal static string StaticCommands_DoNotUseAllowStaticCommand_Title {
+            get {
+                return ResourceManager.GetString("StaticCommands_DoNotUseAllowStaticCommand_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usage of AllowStaticCommand attribute on instance methods is error-prone. It is impossible to change state of viewModel on server! Use static command services instead..
+        /// </summary>
+        internal static string StaticCommands_DoNotUseAllowStaticCommandInstanceMethod_Message {
+            get {
+                return ResourceManager.GetString("StaticCommands_DoNotUseAllowStaticCommandInstanceMethod_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usage of AllowStaticCommand is discouraged in favor of static command services.
+        /// </summary>
+        internal static string StaticCommands_DoNotUseAllowStaticCommandStaticMethod_Message {
+            get {
+                return ResourceManager.GetString("StaticCommands_DoNotUseAllowStaticCommandStaticMethod_Message", resourceCulture);
+            }
+        }
     }
 }

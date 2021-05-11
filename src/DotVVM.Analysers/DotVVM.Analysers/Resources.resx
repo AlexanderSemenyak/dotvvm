@@ -138,4 +138,16 @@
   <data name="Serializability_NonSupportedType_Message" xml:space="preserve">
     <value>Property of type '{0}' is not supported by DotVVM</value>
   </data>
+  <data name="StaticCommands_DoNotUseAllowStaticCommandInstanceMethod_Message" xml:space="preserve">
+    <value>Usage of AllowStaticCommand attribute on instance methods is error-prone. It is impossible to change state of viewModel on server! Use static command services instead.</value>
+  </data>
+  <data name="StaticCommands_DoNotUseAllowStaticCommandStaticMethod_Message" xml:space="preserve">
+    <value>Usage of AllowStaticCommand is discouraged in favor of static command services</value>
+  </data>
+  <data name="StaticCommands_DoNotUseAllowStaticCommand_Description" xml:space="preserve">
+    <value>AllowStaticCommand is error-prone and discouraged in favor of static command services</value>
+  </data>
+  <data name="StaticCommands_DoNotUseAllowStaticCommand_Title" xml:space="preserve">
+    <value>BlaBla</value>
+  </data>
 </root>
