@@ -35,7 +35,8 @@ namespace DotVVM.Framework.Utils
         public static BinaryExpression UpdateType(this BinaryExpression expr, ExpressionType type) =>
             Expression.MakeBinary(type, expr.Left, expr.Right);
 
-        public static Expression Replace(LambdaExpression ex, params Expression[] parameters)
+        /// <summary> Substitutes arguments in the LambdaExpression with the specified expressions. </summary>
+        public static Expression Replace(this LambdaExpression ex, params Expression[] parameters)
         {
             var visitor = new ReplaceVisitor();
             for (int i = 0; i < parameters.Length; i++)
@@ -49,6 +50,10 @@ namespace DotVVM.Framework.Utils
 
         #region Replace overloads
 
+        public static Expression Replace<TRes>(Expression<Func<TRes>> ex)
+        {
+            return Replace(ex as LambdaExpression);
+        }
         public static Expression Replace<T1, TRes>(Expression<Func<T1, TRes>> ex, Expression p1)
         {
             return Replace(ex as LambdaExpression, p1);
@@ -251,7 +256,7 @@ namespace DotVVM.Framework.Utils
                 if (lc != null && rc != null)
                 {
                     if (node.Method != null)
-                        return Expression.Constant(node.Method.Invoke(null, new object[] { lc.Value, rc.Value }));
+                        return Expression.Constant(node.Method.Invoke(null, new object[] { lc.Value, rc.Value }), node.Type);
                     else return node;
                 }
                 else return base.VisitBinary(node);
@@ -260,7 +265,7 @@ namespace DotVVM.Framework.Utils
             protected override Expression VisitUnary(UnaryExpression node)
             {
                 var op = Visit(node.Operand);
-                if (op is ConstantExpression constantExpression)
+                if (op is ConstantExpression constantExpression && node.Method != null)
                 {
                     return Expression.Constant(
                         node.Method.Invoke(null, new object[] { constantExpression.Value }), node.Type);

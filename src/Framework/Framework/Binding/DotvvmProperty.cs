@@ -376,7 +376,7 @@ namespace DotVVM.Framework.Binding
             property.DataContextManipulationAttribute ??=
                 property.GetAttributes<DataContextStackManipulationAttribute>().SingleOrDefault();
             if (property.DataContextManipulationAttribute != null && property.DataContextChangeAttributes.Any())
-                throw new ArgumentException($"{nameof(DataContextChangeAttributes)} and {nameof(DataContextManipulationAttribute)} can not be set both at property '{property.FullName}'.");
+                throw new ArgumentException($"{nameof(DataContextChangeAttributes)} and {nameof(DataContextManipulationAttribute)} cannot be set both at property '{property.FullName}'.");
             property.IsBindingProperty = typeof(IBinding).IsAssignableFrom(property.PropertyType);
             property.ObsoleteAttribute = property.AttributeProvider.GetCustomAttribute<ObsoleteAttribute>();
         }
@@ -441,15 +441,8 @@ namespace DotVVM.Framework.Binding
             return registeredProperties.Values.Where(p => types.Contains(p.DeclaringType)).ToArray();
         }
 
-        public static IEnumerable<DotvvmProperty> GetRegisteredProperties()
-        {
-            return registeredProperties.Values;
-        }
-
-        public static IEnumerable<DotvvmPropertyAlias> GetRegisteredAliases()
-        {
-            return registeredAliases.Values;
-        }
+        public static IEnumerable<DotvvmProperty> AllProperties => registeredProperties.Values;
+        public static IEnumerable<DotvvmPropertyAlias> AllAliases => registeredAliases.Values;
 
         public override string ToString()
         {
