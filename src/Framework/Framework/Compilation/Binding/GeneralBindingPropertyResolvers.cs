@@ -189,7 +189,7 @@ namespace DotVVM.Framework.Compilation.Binding
             ParsedExpressionBindingProperty? expression = null,
             DataContextStack? dataContext = null,
             ResolvedBinding? resolvedBinding = null,
-            LocationInfoBindingProperty? locationInfo = null)
+            DotvvmLocationInfo? locationInfo = null)
         {
             var sb = new StringBuilder();
 
@@ -329,7 +329,13 @@ namespace DotVVM.Framework.Compilation.Binding
                 expr.Type.IsArray ?
                     Expression.ArrayIndex(expr, indexParameter()) :
                 expression.Expression.Type.Implements(typeof(IEnumerable<>), out var ienumerable) ?
-                    (Expression)Expression.Call(typeof(Enumerable).GetMethod("ElementAt", BindingFlags.Public | BindingFlags.Static).MakeGenericMethod(ienumerable.GetGenericArguments()), expression.Expression, indexParameter()) :
+                    (Expression)Expression.Call(
+                        typeof(Enumerable), 
+                        "ElementAt",
+                        ienumerable.GetGenericArguments(),
+                        expression.Expression,
+                        indexParameter()
+                    ) :
                 null;
 
             if (makeIndexer(expression.Expression) is Expression r)
@@ -364,13 +370,13 @@ namespace DotVVM.Framework.Compilation.Binding
             return new StaticCommandOptionsLambdaJavascriptProperty(FormatJavascript(lambda, allowObservableResult: false, configuration.Debug, AddNullChecks));
         }
 
-        public LocationInfoBindingProperty GetLocationInfo(ResolvedBinding resolvedBinding, AssignedPropertyBindingProperty? assignedProperty = null)
+        public DotvvmLocationInfo GetLocationInfo(ResolvedBinding resolvedBinding, AssignedPropertyBindingProperty? assignedProperty = null)
         {
             var fileName = resolvedBinding.TreeRoot?.FileName?.Apply(p => System.IO.Path.Combine(
                 configuration.ApplicationPhysicalPath,
                 p
             ));
-            return new LocationInfoBindingProperty(
+            return new DotvvmLocationInfo(
                 fileName,
                 resolvedBinding.DothtmlNode?.Tokens?.Select(t => (t.ColumnNumber, t.ColumnNumber + t.Length)).ToArray(),
                 resolvedBinding.DothtmlNode?.Tokens?.FirstOrDefault()?.LineNumber ?? -1,

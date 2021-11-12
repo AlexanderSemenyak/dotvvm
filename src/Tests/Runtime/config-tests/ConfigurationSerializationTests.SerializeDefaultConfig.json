@@ -130,6 +130,12 @@
     }
   },
   "properties": {
+    "DotVVM.Framework.Compilation.ControlTree.LifecycleRequirementsAssigningVisitor": {
+      "CompileTimeLifecycleRequirements": {
+        "type": "DotVVM.Framework.Controls.ControlLifecycleRequirements, DotVVM.Framework",
+        "isCompileTimeOnly": true
+      }
+    },
     "DotVVM.Framework.Controls.AuthenticatedView": {
       "AuthenticatedTemplate": {
         "type": "DotVVM.Framework.Controls.ITemplate, DotVVM.Framework",
@@ -581,9 +587,6 @@
       "ValueBinding": {
         "type": "DotVVM.Framework.Binding.Expressions.IValueBinding, DotVVM.Framework",
         "required": true
-      },
-      "ValueType": {
-        "type": "DotVVM.Framework.Controls.FormatValueType, DotVVM.Framework"
       }
     },
     "DotVVM.Framework.Controls.HtmlGenericControl": {
@@ -658,6 +661,9 @@
       "UniqueID": {
         "type": "System.String"
       },
+      "UsedPropertiesInfo": {
+        "type": "DotVVM.Framework.Compilation.ControlUsedPropertiesInfo, DotVVM.Framework"
+      },
       "UseHistoryApiSpaNavigation": {
         "type": "System.Boolean",
         "isValueInherited": true
@@ -666,6 +672,18 @@
     "DotVVM.Framework.Controls.ItemsControl": {
       "DataSource": {
         "type": "System.Object"
+      }
+    },
+    "DotVVM.Framework.Controls.JsComponent": {
+      "Global": {
+        "type": "System.Boolean"
+      },
+      "Name": {
+        "type": "System.String",
+        "required": true
+      },
+      "WrapperTagName": {
+        "type": "System.String"
       }
     },
     "DotVVM.Framework.Controls.ListBox": {
@@ -682,9 +700,6 @@
       },
       "Text": {
         "type": "System.Object"
-      },
-      "ValueType": {
-        "type": "DotVVM.Framework.Controls.FormatValueType, DotVVM.Framework"
       }
     },
     "DotVVM.Framework.Controls.MultiSelector": {
@@ -833,9 +848,6 @@
       }
     },
     "DotVVM.Framework.Controls.SelectorBase": {
-      "DisplayMember": {
-        "type": "System.String"
-      },
       "Enabled": {
         "type": "System.Boolean"
       },
@@ -895,9 +907,6 @@
       },
       "SelectionChanged": {
         "type": "DotVVM.Framework.Binding.Expressions.Command, DotVVM.Framework"
-      },
-      "ValueMember": {
-        "type": "System.String"
       }
     },
     "DotVVM.Framework.Controls.SelectorItem": {
@@ -994,15 +1003,9 @@
       "Type": {
         "type": "DotVVM.Framework.Controls.TextBoxType, DotVVM.Framework"
       },
-      "UpdateTextAfterKeydown": {
-        "type": "System.Boolean"
-      },
       "UpdateTextOnInput": {
         "type": "System.Boolean",
         "isValueInherited": true
-      },
-      "ValueType": {
-        "type": "DotVVM.Framework.Controls.FormatValueType, DotVVM.Framework"
       }
     },
     "DotVVM.Framework.Controls.UITests": {
@@ -1205,6 +1208,23 @@
         "prefix": "Style-",
         "type": "System.Object",
         "fromCapability": "HtmlCapability"
+      }
+    },
+    "DotVVM.Framework.Controls.JsComponent": {
+      "Props": {
+        "prefixes": [
+          "",
+          "prop:"
+        ],
+        "type": "System.Object"
+      },
+      "Templates": {
+        "prefixes": [
+          "",
+          "template-"
+        ],
+        "type": "DotVVM.Framework.Controls.ITemplate, DotVVM.Framework",
+        "mappingMode": "InnerElement"
       }
     },
     "DotVVM.Framework.Controls.RouteLink": {

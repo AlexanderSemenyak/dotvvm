@@ -9,7 +9,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
     <PublicSign>True</PublicSign>
@@ -27,7 +27,7 @@
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.16.0" />
     <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
-    <PackageReference Include="CheckTestOutput" Version="0.4.0" />
+    <PackageReference Include="CheckTestOutput" Version="0.4.2" />
     <PackageReference Include="coverlet.collector" Version="3.1.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
