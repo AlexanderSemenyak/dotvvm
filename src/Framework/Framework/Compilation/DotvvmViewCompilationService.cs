@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using DotVVM.Framework.Compilation.Parser;
 using DotVVM.Framework.Configuration;
 using DotVVM.Framework.Controls.Infrastructure;
+using DotVVM.Framework.Utils;
 
 namespace DotVVM.Framework.Compilation
 {
@@ -153,10 +154,9 @@ namespace DotVVM.Framework.Compilation
 
                     var compiledControl = pageBuilder.builder.Value.BuildControl(controlBuilderFactory, dotvvmConfiguration.ServiceProvider);
 
-                    if (compiledControl is DotvvmView view &&
-                        view.Directives!.TryGetValue(ParserConstants.MasterPageDirective, out var masterPagePath))
+                    if (pageBuilder.descriptor.MasterPage is { FileName: {} masterPagePath })
                     {
-                        masterPage = masterPages.Value.GetOrAdd(masterPagePath, new DotHtmlFileInfo(masterPagePath));
+                        masterPage = masterPages.Value.GetOrAdd(masterPagePath, path => new DotHtmlFileInfo(path));
                     }
 
                     file.Status = CompilationState.CompletedSuccessfully;
@@ -170,6 +170,31 @@ namespace DotVVM.Framework.Compilation
                 }
             }
             return true;
+        }
+
+        /// <summary> Callback from the compiler which adds the view compilation result to the status page. </summary>
+        public void RegisterCompiledView(string file, ViewCompiler.ControlBuilderDescriptor? descriptor, Exception? exception)
+        {
+            var fileInfo =
+                routes.Value.FirstOrDefault(t => t.VirtualPath == file) ??
+                controls.Value.FirstOrDefault(t => t.VirtualPath == file) ??
+                masterPages.Value.GetOrAdd(file, path => new DotHtmlFileInfo(path));
+            
+            if (exception is null)
+            {
+                fileInfo.Status = CompilationState.CompletedSuccessfully;
+                fileInfo.Exception = null;
+            }
+            else
+            {
+                fileInfo.Status = CompilationState.CompilationFailed;
+                fileInfo.Exception = exception.Message;
+            }
+
+            if (descriptor?.MasterPage is { FileName: {} masterPagePath })
+            {
+                masterPages.Value.GetOrAdd(masterPagePath, path => new DotHtmlFileInfo(path));
+            }
         }
     }
 }
