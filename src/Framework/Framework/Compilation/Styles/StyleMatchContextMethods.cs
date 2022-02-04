@@ -13,6 +13,7 @@ using DotVVM.Framework.Utils;
 using DotVVM.Framework.Compilation.ControlTree;
 using DotVVM.Framework.Binding.Expressions;
 using DotVVM.Framework.Controls.Infrastructure;
+using DotVVM.Framework.Binding.Properties;
 
 public static class StyleMatchContextExtensionMethods
 {
@@ -329,6 +330,71 @@ public static class StyleMatchContextExtensionMethods
     public static IStyleMatchContext<T>[] ControlProperty<T>(this IStyleMatchContext c, DotvvmProperty property, bool includeRawLiterals = false)
         where T: DotvvmBindableObject =>
         c.ControlProperty(property, includeRawLiterals).ControlsOfType<T>();
+
+    /// <summary> If the property has a binding, returns the <see cref="Expression" />. Otherwise, returns null. </summary>
+    public static Expression? BindingExpression<TControl, TProp>(this IStyleMatchContext<TControl> c, Expression<Func<TControl, TProp>> pp)
+    {
+        var property = DotvvmPropertyUtils.GetDotvvmPropertyFromExpression(pp);
+        return c.BindingExpression(property);
+    }
+
+    /// <summary> If the property has a binding, returns the <see cref="Expression" />. Otherwise, returns null. </summary>
+    public static Expression? BindingExpression<TControl, TProp>(this IStyleMatchContext<TControl> c, Expression<Func<TControl, ValueOrBinding<TProp>>> pp)
+    {
+        var property = DotvvmPropertyUtils.GetDotvvmPropertyFromExpression(pp);
+        return c.BindingExpression(property);
+    }
+
+    /// <summary> If the property has a binding, returns the <see cref="Expression" />. Otherwise, returns null. </summary>
+    public static Expression? BindingExpression(this IStyleMatchContext c, DotvvmProperty dotprop)
+    {
+        if (c.Control.GetProperty(dotprop) is {} s)
+        {
+            var value = s.GetValue();
+            if (value is IBinding binding)
+                return binding.GetProperty<ParsedExpressionBindingProperty>()?.Expression;
+        }
+        return null;
+    }
+
+    /// <summary> If the property has a binding and it's bound to view model property, returns its <see cref="PropertyInfo" />. Otherwise, returns null. </summary>
+    public static PropertyInfo? BindingProperty<TControl, TProp>(this IStyleMatchContext<TControl> c, Expression<Func<TControl, TProp>> pp)
+    {
+        var property = DotvvmPropertyUtils.GetDotvvmPropertyFromExpression(pp);
+        return c.BindingProperty(property);
+    }
+
+    /// <summary> If the property has a binding and it's bound to view model property, returns its <see cref="PropertyInfo" />. Otherwise, returns null. </summary>
+    public static PropertyInfo? BindingProperty<TControl, TProp>(this IStyleMatchContext<TControl> c, Expression<Func<TControl, ValueOrBinding<TProp>>> pp)
+    {
+        var property = DotvvmPropertyUtils.GetDotvvmPropertyFromExpression(pp);
+        return c.BindingProperty(property);
+    }
+
+    /// <summary> If the property has a binding and it's bound to view model property, returns its <see cref="PropertyInfo" />. Otherwise, returns null. </summary>
+    public static PropertyInfo? BindingProperty(this IStyleMatchContext c, DotvvmProperty dotprop)
+    {
+        var expr = c.BindingExpression(dotprop);
+        while (true)
+        {
+            // unwrap type conversions, negations, ...
+            if (expr is UnaryExpression unary)
+                expr = unary.Operand;
+            // unwrap some method invocations
+            else if (expr is MethodCallExpression boxCall && boxCall.Method.DeclaringType == typeof(BoxingUtils))
+                expr = boxCall.Arguments.First();
+            else if (expr is MethodCallExpression { Method.Name: "ToBrowserLocalTime" or "ToString" } methodCall)
+                expr = methodCall.Object ?? methodCall.Arguments.First();
+            // unwrap binary operation with a constant
+            else if (expr is BinaryExpression { Right.NodeType: ExpressionType.Constant } binaryLeft)
+                expr = binaryLeft.Left;
+            else if (expr is BinaryExpression { Left.NodeType: ExpressionType.Constant } binaryRight)
+                expr = binaryRight.Right;
+            else
+                break;
+        }
+        return (expr as MemberExpression)?.Member as PropertyInfo;
+    }
 
     /// <summary>
     /// Gets the DataContext of the control.

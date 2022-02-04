@@ -16,7 +16,7 @@ namespace DotVVM.Framework.Controls
     /// <summary>
     /// A control that represents plain HTML tag.
     /// </summary>
-    public class HtmlGenericControl : DotvvmControl, IControlWithHtmlAttributes
+    public class HtmlGenericControl : DotvvmControl, IControlWithHtmlAttributes, IObjectWithCapability<HtmlCapability>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HtmlGenericControl"/> class.
@@ -73,30 +73,33 @@ namespace DotVVM.Framework.Controls
             content?.WriteToChildren(this, InnerTextProperty);
         }
 
-        /// <summary>
-        /// Gets the attributes.
-        /// </summary>
+        /// <summary> A dictionary of html attributes that are rendered on this control's html tag. </summary>
         [PropertyGroup(new[] { "", "html:" })]
         public VirtualPropertyGroupDictionary<object?> Attributes => new(this, AttributesGroupDescriptor);
 
+        /// <summary> A dictionary of html attributes that are rendered on this control's html tag. </summary>
         [MarkupOptions(MappingMode = MappingMode.Attribute, AllowBinding = true, AllowHardCodedValue = true, AllowValueMerging = true, AttributeValueMerger = typeof(HtmlAttributeValueMerger), AllowAttributeWithoutValue = true)]
         public static DotvvmPropertyGroup AttributesGroupDescriptor =
             DotvvmPropertyGroup.Register<object, HtmlGenericControl>(new [] { "", "html:" }, nameof(Attributes));
 
+        /// <summary> A dictionary of css classes. All classes which value is `true` will be placed in the `class` attribute. </summary>
         [PropertyGroup("Class-", ValueType = typeof(bool))]
         public VirtualPropertyGroupDictionary<bool> CssClasses => new(this, CssClassesGroupDescriptor);
 
+        /// <summary> A dictionary of css classes. All classes which value is `true` will be placed in the `class` attribute. </summary>
         public static DotvvmPropertyGroup CssClassesGroupDescriptor =
             DotvvmPropertyGroup.Register<bool, HtmlGenericControl>("Class-", nameof(CssClasses));
 
+        /// <summary> A dictionary of css styles which will be placed in the `style` attribute. </summary>
         [PropertyGroup("Style-")]
         public VirtualPropertyGroupDictionary<object> CssStyles => new(this, CssStylesGroupDescriptor);
 
+        /// <summary> A dictionary of css styles which will be placed in the `style` attribute. </summary>
         public static DotvvmPropertyGroup CssStylesGroupDescriptor =
             DotvvmPropertyGroup.Register<object, HtmlGenericControl>("Style-", nameof(CssStyles));
 
         /// <summary>
-        /// Gets or sets the inner text of the HTML element.
+        /// Gets or sets the inner text of the HTML element. Note that this property can only be used on HtmlGenericControl directly and when the control does not have any children.
         /// </summary>
         public string? InnerText
         {
@@ -114,7 +117,7 @@ namespace DotVVM.Framework.Controls
         public string? TagName { get; protected set; }
 
         /// <summary>
-        /// Gets or sets whether the control is visible.
+        /// Gets or sets whether the control is visible. When set to false, `style="display: none"` will be added to this control.
         /// </summary>
         [MarkupOptions(AllowHardCodedValue = false)]
         public bool Visible
@@ -476,13 +479,20 @@ namespace DotVVM.Framework.Controls
     [DotvvmControlCapability]
     public sealed record HtmlCapability
     {
+        /// <summary> A dictionary of html attributes that are rendered on this control's html tag. </summary>
         [PropertyGroup("", "html:")]
         [MarkupOptions(MappingMode = MappingMode.Attribute, AllowBinding = true, AllowHardCodedValue = true, AllowValueMerging = true, AttributeValueMerger = typeof(HtmlAttributeValueMerger), AllowAttributeWithoutValue = true)]
         public IDictionary<string, ValueOrBinding<object?>> Attributes { get; init; } = new Dictionary<string, ValueOrBinding<object?>>();
+
+        /// <summary> A dictionary of css classes. All classes which value is `true` will be placed in the `class` attribute. </summary>
         [PropertyGroup("Class-")]
         public IDictionary<string, ValueOrBinding<bool>> CssClasses { get; init; } = new Dictionary<string, ValueOrBinding<bool>>();
+
+        /// <summary> A dictionary of css styles which will be placed in the `style` attribute. </summary>
         [PropertyGroup("Style-")]
-        public IDictionary<string, ValueOrBinding<object>> CssStyles { get; init; } = new Dictionary<string, ValueOrBinding<object>>();
+        public IDictionary<string, ValueOrBinding<object?>> CssStyles { get; init; } = new Dictionary<string, ValueOrBinding<object?>>();
+
+        /// <summary> When set to false, `style="display: none"` will be added to this control. </summary>
         public ValueOrBinding<bool> Visible { get; init; } = true;
     }
 }
