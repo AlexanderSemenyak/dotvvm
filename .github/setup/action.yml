@@ -46,11 +46,12 @@ runs:
 
   # add powershell build helper
   - run: |
-      'param (
+      '#!/usr/bin/env pwsh
+       param (
           [string][parameter(Position = 0)]$configuration,
           [string][parameter(Position = 1)]$targetFramework,
           [string][parameter(Position = 2)]$project)
-          & "msbuild.exe" -t:Clean,Build -v:m -warnAsError `
+          & "msbuild.exe" -t:Clean,Build -v:m -p:WarningLevel=0 `
               -p:Configuration=$configuration -p:TargetFramework=$targetFramework "$project"
       ' | Out-File "${{ github.workspace }}/build-dotvvm.ps1"
     shell: pwsh
