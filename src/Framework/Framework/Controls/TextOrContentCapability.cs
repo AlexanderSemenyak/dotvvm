@@ -17,6 +17,10 @@ namespace DotVVM.Framework.Controls
         {
             this.Text = text;
         }
+        public TextOrContentCapability(string text)
+        {
+            this.Text = new(text);
+        }
         public TextOrContentCapability(IEnumerable<DotvvmControl> content)
         {
             this.Content = content.ToList();
@@ -47,6 +51,11 @@ namespace DotVVM.Framework.Controls
 
         public IEnumerable<DotvvmControl> ToControls()
         {
+            if (!Text.HasValue && Content == null)
+            {
+                throw new DotvvmControlException("Either Text property or Content must be set.");
+            }
+
             if (Text.HasValue)
                 return new DotvvmControl[] { new Literal(Text.Value) };
             else

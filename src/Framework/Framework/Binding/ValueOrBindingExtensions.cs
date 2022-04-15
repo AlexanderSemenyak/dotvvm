@@ -32,7 +32,7 @@ public static class ValueOrBindingExtensions
                 binding.GetProperty<NegatedBindingExpression>().Binding
             );
         else
-            return !v.ValueOrDefault;
+            return new(!v.ValueOrDefault);
     }
     /// <summary> Returns ValueOrBinding with the value of `!a`. The resulting binding is cached, so it's safe to use this method at runtime. </summary>
     public static ValueOrBinding<bool?> Negate(this ValueOrBinding<bool?> v)
@@ -42,7 +42,7 @@ public static class ValueOrBindingExtensions
                 binding.GetProperty<NegatedBindingExpression>().Binding
             );
         else
-            return !v.ValueOrDefault;
+            return new(!v.ValueOrDefault);
     }
     /// <summary> Returns a binding with the value of `!bindingValue`. The resulting binding is cached, so it's safe to use this method at runtime. </summary>
     public static T Negate<T>(this T binding)
@@ -58,7 +58,7 @@ public static class ValueOrBindingExtensions
                 binding.GetProperty<IsMoreThanZeroBindingProperty>().Binding
             );
         else
-            return v.ValueOrDefault > 0;
+            return new(v.ValueOrDefault > 0);
     }
     /// <summary> Returns ValueOrBinding with the value of `a.Items` where a is grid view dataset. The resulting binding is cached, so it's safe to use this method at runtime. </summary>
     public static ValueOrBinding<IList<T>> GetItems<T>(this ValueOrBinding<IBaseGridViewDataSet<T>> v)
@@ -115,13 +115,37 @@ public static class ValueOrBindingExtensions
             return new(string.IsNullOrWhiteSpace(v.ValueOrDefault));
     }
 
+    /// <summary> Returns if the ValueOrBinding contains a value and the value is equal to <paramref name="value"/>. </summary>
+    public static bool ValueEquals<T>(this ValueOrBinding<T> v, [MaybeNull] T value)
+    {
+        if (v.HasBinding)
+            return false;
+        else
+            return EqualityComparer<T>.Default.Equals(v.ValueOrDefault, value);
+    }
+
+    /// <summary> Returns if the ValueOrBinding contains a value and the value is equal to <paramref name="value"/>. </summary>
+    public static bool ValueEquals<T>(this ValueOrBinding<T> v, [MaybeNull] T value, IEqualityComparer<T> comparer)
+    {
+        if (v.HasBinding)
+            return false;
+        else
+            return comparer.Equals(v.ValueOrDefault, value);
+    }
+
+    /// <summary> Returns true if the ValueOrBinding contains value, but the value is null. </summary>
+    public static bool ValueIsNull<T>(this ValueOrBinding<T> v) => v.HasValue && v.ValueOrDefault is null;
+
+    /// <summary> Returns true if the ValueOrBinding contains value, but the value is null or an empty string. </summary>
+    public static bool ValueIsNullOrEmpty(this ValueOrBinding<string> v) => v.HasValue && string.IsNullOrEmpty(v.ValueOrDefault);
+
     /// <summary> Returns ValueOrBinding with the value of `a &amp;&amp; b`. If both a and b contain a binding, they are combined together. The result is cached, so it's safe to use this method at runtime. </summary>
     public static ValueOrBinding<bool> And(this ValueOrBinding<bool> a, ValueOrBinding<bool> b)
     {
         if (a.HasValue)
-            return a.ValueOrDefault ? b : false;
+            return a.ValueOrDefault ? b : new(false);
         if (b.HasValue)
-            return b.ValueOrDefault ? a : false;
+            return b.ValueOrDefault ? a : new(false);
         return new(BindingCombinator.GetCombination(
             BindingCombinator.AndAlsoCombination,
             a.BindingOrDefault,
@@ -132,9 +156,9 @@ public static class ValueOrBindingExtensions
     public static ValueOrBinding<bool> Or(this ValueOrBinding<bool> a, ValueOrBinding<bool> b)
     {
         if (a.HasValue)
-            return a.ValueOrDefault ? true : b;
+            return a.ValueOrDefault ? new(true) : b;
         if (b.HasValue)
-            return b.ValueOrDefault ? true : a;
+            return b.ValueOrDefault ? new(true) : a;
         return new(BindingCombinator.GetCombination(
             BindingCombinator.OrElseCombination,
             a.BindingOrDefault,

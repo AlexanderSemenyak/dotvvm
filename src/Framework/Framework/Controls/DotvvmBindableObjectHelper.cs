@@ -50,9 +50,25 @@ namespace DotVVM.Framework.Controls
             control.SetBinding(control.GetDotvvmProperty(propName), binding);
             return control;
         }
-
         /// <summary> Sets value or binding into the DotvvmProperty referenced in the lambda expression. Returns <paramref name="control"/> for fluent API usage. </summary>
         public static TControl SetProperty<TControl, TProperty>(this TControl control, Expression<Func<TControl, TProperty>> prop, ValueOrBinding<TProperty> value)
+            where TControl : DotvvmBindableObject
+        {
+            control.SetValue(control.GetDotvvmProperty(prop), value.UnwrapToObject());
+            return control;
+        }
+        /// <summary> Sets value or binding into the DotvvmProperty referenced in the lambda expression. Returns <paramref name="control"/> for fluent API usage. </summary>
+        public static TControl SetProperty<TControl, TProperty>(this TControl control, Expression<Func<TControl, TProperty>> prop, ValueOrBinding<TProperty>? value)
+            where TControl : DotvvmBindableObject
+        {
+            if (value.HasValue)
+            {
+                control.SetProperty(prop, value.Value);
+            }
+            return control;
+        }
+        /// <summary> Sets value or binding into the DotvvmProperty referenced in the lambda expression. Returns <paramref name="control"/> for fluent API usage. </summary>
+        public static TControl SetProperty<TControl, TProperty>(this TControl control, Expression<Func<TControl, TProperty>> prop, TProperty value)
             where TControl : DotvvmBindableObject
         {
             control.SetValue(control.GetDotvvmProperty(prop), value);
@@ -85,6 +101,22 @@ namespace DotVVM.Framework.Controls
                 control.SetProperty(property, valueOrBinding.GetValueOrDefault());
             else
                 control.Properties.Remove(property);
+            return control;
+        }
+
+        /// <summary> Sets value or binding into the DotvvmProperty with specified name. Returns <paramref name="control"/> for fluent API usage. </summary>
+        public static TControl SetProperty<TControl>(this TControl control, string propName, object? value)
+            where TControl : DotvvmBindableObject
+        {
+            control.SetProperty(control.GetDotvvmProperty(propName), value);
+            return control;
+        }
+
+        /// <summary> Sets value or binding into the DotvvmProperty. Returns <paramref name="control"/> for fluent API usage. </summary>
+        public static TControl SetProperty<TControl>(this TControl control, DotvvmProperty property, object? value)
+            where TControl: DotvvmBindableObject
+        {
+            control.SetValue(property, value);
             return control;
         }
 
@@ -160,7 +192,7 @@ namespace DotVVM.Framework.Controls
             where TControl : IControlWithHtmlAttributes
         {
             if (value is not null)
-                control.Attributes.Add(attribute, value);
+                control.Attributes.Add(attribute, ValueOrBindingExtensions.UnwrapToObject(value));
             return control;
         }
         /// <summary> Appends a value into the specified html attribute. If the attribute already exists, the old and new values are merged. Returns <paramref name="control"/> for fluent API usage. </summary>
@@ -168,6 +200,12 @@ namespace DotVVM.Framework.Controls
             where TControl : IControlWithHtmlAttributes
         {
             return AddAttribute(control, attribute, value?.UnwrapToObject());
+        }
+        /// <summary> Appends a value into the specified html attribute. If the attribute already exists, the old and new values are merged. Returns <paramref name="control"/> for fluent API usage. </summary>
+        public static TControl AddAttribute<TControl, TValue>(this TControl control, string attribute, ValueOrBinding<TValue> value)
+            where TControl : IControlWithHtmlAttributes
+        {
+            return AddAttribute(control, attribute, value.UnwrapToObject());
         }
 
         /// <summary> Appends a list of css attributes to the control. If the attributes already exist, the old and new values are merged. Returns <paramref name="control"/> for fluent API usage. </summary>
@@ -193,6 +231,13 @@ namespace DotVVM.Framework.Controls
             where TControl : IControlWithHtmlAttributes
         {
             return AddAttribute(control, "class", className.UnwrapToObject());
+        }
+
+        /// <summary> Appends a css class to this control. Note that it is currently not supported if multiple bindings would have to be joined together. Returns <paramref name="control"/> for fluent API usage. </summary>
+        public static TControl AddCssClass<TControl>(this TControl control, string className)
+            where TControl : IControlWithHtmlAttributes
+        {
+            return AddAttribute(control, "class", className);
         }
 
         /// <summary> Appends a list of css classes to this control. Returns <paramref name="control"/> for fluent API usage. </summary>
