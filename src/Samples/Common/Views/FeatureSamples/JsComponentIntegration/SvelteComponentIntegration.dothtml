@@ -17,9 +17,9 @@
     </div>
 
 
-    <dot:Button data-ui="command-regenerate" Click={command: Regenerate()} Text="Regenerate chart"></dot:Button>
-    <dot:Button data-ui="command-removeDOM" Click={staticCommand: IncludeInPage = false} Text="Remove from DOM"></dot:Button>
-    <dot:Button data-ui="command-addDOM" Click={staticCommand: IncludeInPage = true} Text="Add to DOM"></dot:Button>
+    <js:Button dataUI="command-regenerate" click={command: Regenerate()} text="Regenerate chart"/>
+    <js:Button dataUI="command-removeDOM" click={staticCommand: IncludeInPage = false} text="Remove from DOM"/>
+    <js:Button dataUI="command-addDOM" click={staticCommand: IncludeInPage = true} text="Add to DOM" />
 
     <p>
         CurrentThing:<span data-ui="result">{{value: CurrentThing}}</span>
@@ -38,6 +38,35 @@
         </div>
 
     </div>
+
+    <h3> Knockout templates rendered from Svelte component </h3>
+
+    <dot:CheckBox Checked="{value: Condition}" data-ui="template-condition" Text="Condition for template selector" />
+
+    <js:TemplateSelector condition={value: Condition}>
+        <template1>
+            <span data-ui="template1">
+                Condition == true (and IncludeInPage = {{value: IncludeInPage}})
+            </span>
+        </template1>
+        <template2>
+            <span data-ui="template2">
+                Condition == false
+            </span>
+            <ul data-ui="template2-commandSection">
+                <li>
+                    <js:Button text="Test command" dataUI="template2-command" click="{command: ChangeCurrentThing()}" />
+                </li>
+                <li>
+                    <dot:Button Text="Test static command" data-ui="template2-clientStaticCommand" Click="{staticCommand:  CurrentThing = "StaticCommandInvoked"}" />
+                </li>
+                <li>
+                    <dot:Button Text="Test server static command" data-ui="template2-serverStaticCommand" Click="{staticCommand: CurrentThing = viewModelType.GetCurrentThing() }" />
+                </li>
+            </ul>
+        </template2>
+    </js:TemplateSelector>
+
 </body>
 </html>
 
